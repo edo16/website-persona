@@ -1,0 +1,85 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Shopee</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <header class="flex items-center justify-between p-4 bg-orange-500 text-white">
+    <h1 class="text-2xl font-bold">Mini Shopee</h1>
+    <div class="flex gap-2 items-center">
+      <input type="text" id="search" placeholder="Cari produk..." class="p-2 rounded text-black" />
+      <select id="category-filter" class="p-2 rounded text-black">
+        <option value="all">Semua Kategori</option>
+      </select>
+      <div class="cursor-pointer" onclick="toggleCart()">🛒 <span id="cart-count" class="font-bold">0</span></div>
+    </div>
+  </header>
+
+  <main class="p-4">
+    <section id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center"></section>
+
+    <aside id="cart" class="hidden fixed top-20 right-0 w-80 bg-white shadow-lg p-4 z-50 transition-transform transform duration-500">
+      <h2 class="text-xl font-bold mb-4">Keranjang</h2>
+      <ul id="cart-items" class="space-y-2"></ul>
+      <p class="mt-4 font-semibold">Total: Rp <span id="total">0</span></p>
+      <div class="text-center my-4">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?data=BayarQRIS123&size=150x150" alt="QRIS" class="mx-auto">
+        <p class="text-sm text-gray-500">Scan QRIS untuk pembayaran</p>
+      </div>
+      <button onclick="checkout()" class="mt-2 w-full bg-orange-500 text-white py-2 rounded animate-pulse">Checkout</button>
+    </aside>
+
+    <section class="mt-10">
+      <h2 class="text-xl font-bold mb-4">Riwayat Transaksi</h2>
+      <ul id="order-history" class="space-y-4"></ul>
+    </section>
+
+    <!-- Modal Struk -->
+    <div id="receipt-modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white w-80 p-4 rounded text-sm font-mono animate-fade-in">
+        <h2 class="text-center font-bold mb-2">STRUK PEMBELIAN</h2>
+        <div id="receipt-content"></div>
+        <p class="text-center mt-4 text-xs">Terima kasih telah berbelanja!</p>
+        <div class="flex gap-2 mt-4">
+          <button onclick="printReceipt()" class="w-1/2 bg-blue-500 text-white py-1 rounded">Cetak</button>
+          <button onclick="savePDF()" class="w-1/2 bg-green-500 text-white py-1 rounded">Simpan PDF</button>
+        </div>
+        <button onclick="document.getElementById('receipt-modal').classList.add('hidden')" class="mt-2 w-full bg-gray-300 py-1 rounded">Tutup</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  <script>
+    function printReceipt() {
+      const content = document.getElementById('receipt-content').innerHTML;
+      const printWindow = window.open('', '', 'width=600,height=600');
+      printWindow.document.write('<pre>' + content + '</pre>');
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }
+
+    async function savePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const content = document.getElementById('receipt-content').innerText;
+  const lines = content.split('\n');
+  let y = 10;
+  lines.forEach(line => {
+    doc.text(line, 10, y);
+    y += 10;
+  });
+  doc.save('struk-belanja.pdf');
+}
+
+  </script>
+</body>
+</html>
